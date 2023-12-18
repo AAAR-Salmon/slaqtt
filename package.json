@@ -1,0 +1,16 @@
+{
+  "name": "slaqtt",
+  "version": "0.1.0",
+  "description": "A bridge between Slack and MQTT",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "packageManager": "npm@10.2.5",
+  "keywords": [
+    "slack-bot",
+    "mqtt"
+  ],
+  "author": "AAAR-Salmon",
+  "license": "MIT"
+}
