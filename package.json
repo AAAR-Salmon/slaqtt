@@ -4,7 +4,7 @@
   "description": "A bridge between Slack and MQTT",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "packageManager": "npm@10.2.5",
   "keywords": [
