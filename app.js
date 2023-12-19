@@ -1,5 +1,10 @@
 require('dotenv').config();
 const { App } = require('@slack/bolt');
+const mqtt = require('mqtt');
+
+async function jsonParseAsync(json) {
+  return JSON.parse(json);
+}
 
 const app = new App({
   // logLevel: 'debug',
@@ -8,8 +13,20 @@ const app = new App({
 });
 
 (async () => {
-  await app.client.chat.postMessage({
-    channel: '#bottest',
-    text: 'hoge'
+  const client = mqtt.connect(process.env.MQTT_BROKER);
+
+  client.on('connect', () => {
+    client.subscribe(process.env.MQTT_SUB_TOPIC);
+  });
+
+  client.on('message', (_topic, json) => {
+    jsonParseAsync(json)
+      .then(async ({ channel, text }) => {
+        await app.client.chat.postMessage({
+          channel,
+          text
+        });
+      })
+      .catch(console.error);
   });
 })();
