@@ -1,6 +1,12 @@
+const { z } = require('zod');
 require('dotenv').config();
 const { App } = require('@slack/bolt');
 const mqtt = require('mqtt');
+
+const Message = z.object({
+  channel: z.string(),
+  text: z.string(),
+});
 
 async function jsonParseAsync(json) {
   return JSON.parse(json);
@@ -21,6 +27,7 @@ const app = new App({
 
   client.on('message', (_topic, json) => {
     jsonParseAsync(json)
+      .then(Message.parse)  // validate Message Schema
       .then(async ({ channel, text }) => {
         await app.client.chat.postMessage({
           channel,
