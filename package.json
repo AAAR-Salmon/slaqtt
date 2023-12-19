@@ -12,5 +12,9 @@
     "mqtt"
   ],
   "author": "AAAR-Salmon",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^3.16.0",
+    "dotenv": "^16.3.1"
+  }
 }
