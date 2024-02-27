@@ -2,9 +2,13 @@
   "name": "slaqtt",
   "version": "0.1.0",
   "description": "A bridge between Slack and MQTT",
-  "main": "index.js",
+  "main": "./lib/index.js",
+  "bin": {
+    "slaqtt": "./lib/slaqtt.js"
+  },
   "scripts": {
-    "start": "node app.js"
+    "build": "tsc -p .",
+    "start": "npm run build && node ./lib/slaqtt.js"
   },
   "packageManager": "npm@10.2.5",
   "keywords": [
@@ -16,7 +20,10 @@
   "dependencies": {
     "@slack/bolt": "^3.16.0",
     "dotenv": "^16.3.1",
-    "mqtt": "^5.3.3",
-    "zod": "^3.22.4"
+    "mqtt": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.20",
+    "typescript": "^5.3.3"
   }
 }
