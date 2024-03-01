@@ -7,7 +7,11 @@ Slack と MQTT ブローカを接続するためのブリッジ
 - [x] MQTT メッセージを subscribe し Slack にメッセージを送信する
 - [ ] Slack のメッセージを監視し MQTT メッセージを publish する
 
-## 使用方法
+## セットアップ手順
+
+### 依存ソフトウェア
+
+* Node.js 20+
 
 ### Slack app の作成
 
@@ -22,14 +26,21 @@ Slack と MQTT ブローカを接続するためのブリッジ
 ### 実行
 
 1. このリポジトリを clone する．
-2. .env.example をコピーし .env とする．
-3. Signing Secret と Bot User OAuth Token を [Slack API][slack-api-app] のページから取得し .env に書き込む．
-4. MQTT ブローカのアドレスと Subscribe する Topic を .env に書き込む．
+2. `.env.example` をコピーし `.env` とする．
+3. Signing Secret と Bot User OAuth Token を [Slack API][slack-api-app] のページから取得し `.env` に書き込む．
+4. MQTT ブローカのアドレスと Subscribe する Topic を `.env` に書き込む．
+5. リポジトリのディレクトリに移動する (`cd slaqtt`)．
+6. `npm install; npm run start`
+
+## 利用方法
 
 ### メッセージの送信
 
-指定した MQTT Topic で以下の形式の JSON メッセージを Publish することで，このブリッジはメッセージを送信する．
-メッセージを送信するためには予め <u>Slack app の作成</u> で作成した app をチャンネルに追加しておく必要がある．
+メッセージを送信するためには予め [Slack app の作成](#slack-app-の作成) で作成した app をチャンネルに追加しておく必要がある．
+
+#### JSON
+
+`.env` に `MQTT_SUB_JSON_TOPIC` で指定した MQTT Topic で，以下の形式の JSON メッセージを Publish することで，このブリッジはメッセージを送信する．
 
 ```json
 {
@@ -37,5 +48,14 @@ Slack と MQTT ブローカを接続するためのブリッジ
    "text": "<メッセージの内容>"
 }
 ```
+
+#### プレーンテキスト
+
+`.env` に `MQTT_SUB_TEXT_TOPIC` で指定した MQTT Topic で，テキストを Publish することで，このブリッジはメッセージを送信する．
+
+送信先のチャンネルは `MQTT_SUB_TEXT_TOPIC` の設定値の `:channel` を置換して設定する．
+例えば，`MQTT_SUB_TEXT_TOPIC=a/topic/to/subscribe/text/:channel` の場合，Topic が `a/topic/to/subscribe/text/general` であるメッセージを Publish することで，ブリッジは general チャンネルにメッセージを送信する．
+
+テキストのエンコーディングは UTF-8 を用いる必要がある．
 
 [slack-api-app]: https://api.slack.com/apps
