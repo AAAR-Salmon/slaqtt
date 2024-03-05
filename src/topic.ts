@@ -1,4 +1,4 @@
-import { PayloadFormat } from "./types/payloadFormat";
+import { PayloadFormat } from './types/payloadFormat';
 
 
 export function isValidChannelPattern(pattern: string): boolean {
@@ -40,7 +40,7 @@ export async function getChannelFromTextTopic(topic: string, pattern: string): P
   const re = await channelPatternToRegexp(pattern);
   const match = topic.match(re);
   if (match === null) {
-  // FIXME: appropreate error type
+    // FIXME: appropreate error type
     throw new Error();
   }
   return match.groups!.channel;

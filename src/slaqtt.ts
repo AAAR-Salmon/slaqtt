@@ -46,16 +46,16 @@ const app = new App({
 
     let message: Message;
     switch (payloadType) {
-      case PayloadFormat.Text:
-        message = {
-          channel: await getChannelFromTextTopic(topic, textTopic),
-          text: payload.toString(),
-        };
-        break;
-      case PayloadFormat.Json:
-        // TODO: validate JSON
-        message = await parseJsonSafely<Message>(payload.toString());
-        break;
+    case PayloadFormat.Text:
+      message = {
+        channel: await getChannelFromTextTopic(topic, textTopic),
+        text: payload.toString(),
+      };
+      break;
+    case PayloadFormat.Json:
+      // TODO: validate JSON
+      message = await parseJsonSafely<Message>(payload.toString());
+      break;
     }
 
     // FIXME: no catch

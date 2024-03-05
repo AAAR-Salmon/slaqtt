@@ -1,4 +1,4 @@
 export enum PayloadFormat {
-  Text = "text/plain",
-  Json = "application/json",
+  Text = 'text/plain',
+  Json = 'application/json',
 }
