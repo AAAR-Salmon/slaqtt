@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { App } from '@slack/bolt';
-import mqtt from 'mqtt';
+import { App as SlackApp } from '@slack/bolt';
+import mqtt, { MqttClient } from 'mqtt';
 import { getChannelFromTextTopic, inferPayloadFormatFromTopic } from './topic';
 import { PayloadFormat } from './types/payloadFormat';
 
@@ -14,30 +14,39 @@ async function parseJsonSafely<T>(json: string): Promise<T> {
   return JSON.parse(json);
 }
 
-// TODO: validate .env
+async function main() {
+  // TODO: validate .env
 
-const app = new App({
-  // logLevel: 'debug',
-  token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET,
-});
-
-(async () => {
-  const client = mqtt.connect(process.env.MQTT_BROKER!);
-
-  const textTopic: string = process.env.MQTT_SUB_TEXT_TOPIC!;
-  const jsonTopic: string = process.env.MQTT_SUB_JSON_TOPIC!;
-
-  client.on('connect', () => {
-    client.subscribe(textTopic.replace(':channel', '+'));
-    client.subscribe(jsonTopic);
+  const slackApp = new SlackApp({
+    // logLevel: 'debug',
+    token: process.env.SLACK_BOT_TOKEN,
+    signingSecret: process.env.SLACK_SIGNING_SECRET,
   });
 
-  client.on('message', async (topic, payload) => {
+  const mqttClient = mqtt.connect(process.env.MQTT_BROKER!);
+  const mqttTopics = {
+    textTopic: process.env.MQTT_SUB_TEXT_TOPIC!,
+    jsonTopic: process.env.MQTT_SUB_JSON_TOPIC!,
+  };
+
+  run(slackApp, mqttClient, mqttTopics);
+}
+
+async function run(
+  slackApp: SlackApp,
+  mqttClient: MqttClient,
+  mqttTopics: { textTopic: string; jsonTopic: string },
+) {
+  mqttClient.on('connect', () => {
+    mqttClient.subscribe(mqttTopics.textTopic.replace(':channel', '+'));
+    mqttClient.subscribe(mqttTopics.jsonTopic);
+  });
+
+  mqttClient.on('message', async (topic, payload) => {
     const payloadType = await inferPayloadFormatFromTopic(topic, {
-      [PayloadFormat.Text]: textTopic,
-      [PayloadFormat.Json]: jsonTopic,
-    }).catch(e => {
+      [PayloadFormat.Text]: mqttTopics.textTopic,
+      [PayloadFormat.Json]: mqttTopics.jsonTopic,
+    }).catch((e) => {
       console.error('Received message with unexpected topic:', topic);
       // FIXME: appropreate error type
       throw new Error(e);
@@ -45,19 +54,21 @@ const app = new App({
 
     let message: Message;
     switch (payloadType) {
-    case PayloadFormat.Text:
-      message = {
-        channel: await getChannelFromTextTopic(topic, textTopic),
-        text: payload.toString(),
-      };
-      break;
-    case PayloadFormat.Json:
-      // TODO: validate JSON
-      message = await parseJsonSafely<Message>(payload.toString());
-      break;
+      case PayloadFormat.Text:
+        message = {
+          channel: await getChannelFromTextTopic(topic, mqttTopics.textTopic),
+          text: payload.toString(),
+        };
+        break;
+      case PayloadFormat.Json:
+        // TODO: validate JSON
+        message = await parseJsonSafely<Message>(payload.toString());
+        break;
     }
 
     // FIXME: no catch
-    await app.client.chat.postMessage({ ...message });
+    await slackApp.client.chat.postMessage({ ...message });
   });
-})();
+}
+
+main();

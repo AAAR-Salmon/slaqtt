@@ -1,6 +1,5 @@
 import { PayloadFormat } from './types/payloadFormat';
 
-
 export function isValidChannelPattern(pattern: string): boolean {
   return /(^|\/):channel($|\/)/.test(pattern);
 }
@@ -36,7 +35,10 @@ export async function inferPayloadFormatFromTopic(
   throw new Error();
 }
 
-export async function getChannelFromTextTopic(topic: string, pattern: string): Promise<string> {
+export async function getChannelFromTextTopic(
+  topic: string,
+  pattern: string,
+): Promise<string> {
   const re = await channelPatternToRegexp(pattern);
   const match = topic.match(re);
   if (match === null) {
