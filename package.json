@@ -10,7 +10,7 @@
     "build": "tsc -p .",
     "lint": "eslint src/",
     "lint:fix": "eslint --fix src/",
-    "start": "npm run build && node ./lib/slaqtt.js",
+    "start": "npm run build && dotenvx run -- node ./lib/slaqtt.js",
     "test": "jest"
   },
   "packageManager": "npm@10.2.5",
@@ -22,10 +22,10 @@
   "license": "MIT",
   "dependencies": {
     "@slack/bolt": "^3.16.0",
-    "dotenv": "^16.3.1",
     "mqtt": "^5.3.3"
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^0.24.0",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.20",
     "@typescript-eslint/eslint-plugin": "^7.1.1",

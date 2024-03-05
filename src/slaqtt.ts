@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import 'dotenv/config';
 import { App } from '@slack/bolt';
 import mqtt from 'mqtt';
 import { getChannelFromTextTopic, inferPayloadFormatFromTopic } from './topic';
