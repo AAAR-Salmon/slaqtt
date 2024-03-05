@@ -10,16 +10,4 @@ parserOptions:
   sourceType: module
 plugins:
   - '@typescript-eslint'
-rules:
-  indent:
-    - warn
-    - 2
-  linebreak-style:
-    - warn
-    - unix
-  quotes:
-    - warn
-    - single
-  semi:
-    - warn
-    - always
+rules: {}
