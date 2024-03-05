@@ -3,6 +3,8 @@
 import 'dotenv/config';
 import { App } from '@slack/bolt';
 import mqtt from 'mqtt';
+import { getChannelFromTextTopic, inferPayloadFormatFromTopic } from './topic';
+import { PayloadFormat } from './types/payloadFormat';
 
 interface Message {
   channel: string;
@@ -33,24 +35,24 @@ const app = new App({
   });
 
   client.on('message', async (topic, payload) => {
-    const payloadType = inferPayloadTypeFromTopic(topic, {
-      [PayloadType.Text]: textTopic,
-      [PayloadType.Json]: jsonTopic,
-    });
-    if (payloadType === null) {
+    const payloadType = await inferPayloadFormatFromTopic(topic, {
+      [PayloadFormat.Text]: textTopic,
+      [PayloadFormat.Json]: jsonTopic,
+    }).catch(e => {
       console.error('Received message with unexpected topic:', topic);
-      return;
-    }
+      // FIXME: appropreate error type
+      throw new Error(e);
+    });
 
     let message: Message;
     switch (payloadType) {
-      case PayloadType.Text:
+      case PayloadFormat.Text:
         message = {
-          channel: getChannelFromTextTopic(topic, textTopic),
+          channel: await getChannelFromTextTopic(topic, textTopic),
           text: payload.toString(),
         };
         break;
-      case PayloadType.Json:
+      case PayloadFormat.Json:
         // TODO: validate JSON
         message = await parseJsonSafely<Message>(payload.toString());
         break;
@@ -60,31 +62,3 @@ const app = new App({
     await app.client.chat.postMessage({ ...message });
   });
 })();
-
-enum PayloadType {
-  Text = "text/plain",
-  Json = "application/json",
-}
-
-function inferPayloadTypeFromTopic(
-  topic: string,
-  pattern: { [key in PayloadType]: string },
-): PayloadType | null {
-  if (topic === pattern[PayloadType.Json]) {
-    return PayloadType.Json;
-  }
-
-  const re = new RegExp(pattern[PayloadType.Text].replace(':channel', '(?<channel>[^/]+)'));
-  if (re.test(topic)) {
-    return PayloadType.Text;
-  }
-
-  return null;
-}
-
-function getChannelFromTextTopic(topic: string, pattern: string): string {
-  // FIXME: duplicated code
-  const re = new RegExp(pattern.replace(':channel', '(?<channel>[^/]+)'));
-  const match = topic.match(re)!;
-  return match.groups!.channel;
-}
