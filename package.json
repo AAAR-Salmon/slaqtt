@@ -8,7 +8,8 @@
   },
   "scripts": {
     "build": "tsc -p .",
-    "start": "npm run build && node ./lib/slaqtt.js"
+    "start": "npm run build && node ./lib/slaqtt.js",
+    "test": "jest"
   },
   "packageManager": "npm@10.2.5",
   "keywords": [
@@ -23,7 +24,10 @@
     "mqtt": "^5.3.3"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.12",
     "@types/node": "^20.11.20",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
     "typescript": "^5.3.3"
   }
 }
