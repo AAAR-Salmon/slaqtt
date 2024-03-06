@@ -43,31 +43,37 @@ async function run(
   });
 
   mqttClient.on('message', async (topic, payload) => {
-    const payloadType = await inferPayloadFormatFromTopic(topic, {
-      [PayloadFormat.Text]: mqttTopics.textTopic,
-      [PayloadFormat.Json]: mqttTopics.jsonTopic,
-    }).catch((e) => {
-      console.error('Received message with unexpected topic:', topic);
-      // FIXME: appropreate error type
-      throw new Error(e);
-    });
+    try {
+      const payloadType = await inferPayloadFormatFromTopic(topic, {
+        [PayloadFormat.Text]: mqttTopics.textTopic,
+        [PayloadFormat.Json]: mqttTopics.jsonTopic,
+      }).catch((e) => {
+        console.error('Received message with unexpected topic:', topic);
+        // FIXME: appropreate error type
+        throw new Error(e);
+      });
 
-    let message: Message;
-    switch (payloadType) {
-      case PayloadFormat.Text:
-        message = {
-          channel: await getChannelFromTextTopic(topic, mqttTopics.textTopic),
-          text: payload.toString(),
-        };
-        break;
-      case PayloadFormat.Json:
-        // TODO: validate JSON
-        message = await parseJsonSafely<Message>(payload.toString());
-        break;
+      let message: Message;
+      switch (payloadType) {
+        case PayloadFormat.Text:
+          message = {
+            // FIXME: no catch
+            channel: await getChannelFromTextTopic(topic, mqttTopics.textTopic),
+            text: payload.toString(),
+          };
+          break;
+        case PayloadFormat.Json:
+          // FIXME: no catch
+          // TODO: validate JSON
+          message = await parseJsonSafely<Message>(payload.toString());
+          break;
+      }
+
+      // FIXME: no catch
+      await slackApp.client.chat.postMessage({ ...message });
+    } catch (e) {
+      console.error(e);
     }
-
-    // FIXME: no catch
-    await slackApp.client.chat.postMessage({ ...message });
   });
 }
 
