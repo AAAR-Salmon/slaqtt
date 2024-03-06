@@ -30,7 +30,7 @@ Slack と MQTT ブローカを接続するためのブリッジ
 3. Signing Secret と Bot User OAuth Token を [Slack API][slack-api-app] のページから取得し `.env` に書き込む．
 4. MQTT ブローカのアドレスと Subscribe する Topic を `.env` に書き込む．
 5. リポジトリのディレクトリに移動する (`cd slaqtt`)．
-6. `npm install; npm run start`
+6. `npm install; npm run build; npm run start:env`
 
 ## 利用方法
 
