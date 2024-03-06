@@ -1,0 +1,17 @@
+[Unit]
+Description=Slaqtt: A bridge between Slack and MQTT
+
+[Service]
+# Change path to suit your environment
+WorkingDirectory=<path to repository>
+ExecStart=<path to node> ./lib/slaqtt.js
+EnvironmentFile=<path to .env>
+
+# Change user who owns this repository
+User=slaqtt
+
+Type=simple
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -12,7 +12,8 @@
     "format:dry": "prettier --check src/",
     "lint": "eslint src/",
     "lint:fix": "eslint --fix src/",
-    "start": "npm run build && dotenvx run -- node ./lib/slaqtt.js",
+    "start": "node ./lib/slaqtt.js",
+    "start:env": "dotenvx run -- node ./lib/slaqtt.js",
     "test": "jest"
   },
   "packageManager": "npm@10.2.5",
